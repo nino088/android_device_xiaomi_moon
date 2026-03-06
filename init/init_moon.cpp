@@ -32,6 +32,6 @@ void vendor_load_properties()
         property_override(string("ro.product.") + prop + string("marketname"), "Redmi 13");
         property_override(string("ro.product.") + prop + string("cert"), "24040RN64Y");
     }
-    property_override("ro.bootimage.build.date.utc", "1705914924");
-    property_override("ro.build.date.utc", "1705914924");
+    property_override("ro.bootimage.build.date.utc", "1714403853");
+    property_override("ro.build.date.utc", "1714403853");
 }
