@@ -6,7 +6,8 @@
 DEVICE_PATH := device/xiaomi/moon
 
 TARGET_RECOVERY_DEVICE_DIRS := \
-    $(DEVICE_PATH)
+    $(DEVICE_PATH) \
+
 
 # Architecture
 TARGET_ARCH := arm64
