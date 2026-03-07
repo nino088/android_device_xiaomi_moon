@@ -103,10 +103,6 @@ TARGET_SYSTEM_PROP += $(DEVICE_PATH)/system.prop
 # System as root
 BOARD_BUILD_SYSTEM_ROOT_IMAGE := false
 
-# Init
-TARGET_INIT_VENDOR_LIB := //$(DEVICE_PATH):libinit_moon
-TARGET_RECOVERY_DEVICE_MODULES := libinit_moon
-
 # Recovery
 BOARD_HAS_LARGE_FILESYSTEM := true
 BOARD_USES_GENERIC_KERNEL_IMAGE := true
@@ -152,7 +148,6 @@ TARGET_USES_LOGD := true
 TARGET_USES_MKE2FS := true
 TW_MAX_BRIGHTNESS := 255
 TW_LOAD_VENDOR_BOOT_MODULES := true
-TW_DEVICE_VERSION := A12+_HyperOS
 TW_CUSTOM_CPU_TEMP_PATH := /sys/devices/virtual/thermal/thermal_zone25/temp
 
 # StatusBar
@@ -167,6 +162,9 @@ ALLOW_MISSING_DEPENDENCIES := true
 # Assert
 TARGET_OTA_ASSERT_DEVICE := moon
 
-# Init
+ Init
 TARGET_INIT_VENDOR_LIB := libinit_moon
 TARGET_RECOVERY_DEVICE_MODULES := libinit_moon
+
+# Maintainer
+TW_DEVICE_VERSION := A12+_HyperOS
