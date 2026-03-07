@@ -165,6 +165,3 @@ ALLOW_MISSING_DEPENDENCIES := true
 
 # Assert
 TARGET_OTA_ASSERT_DEVICE := moon
-
-# Maintainer
-TW_DEVICE_VERSION := nino_kelvin
