@@ -17,11 +17,14 @@
 # Only the below variable(s) need to be changed!
 #
 
-# Inherit from hardware-specific part of the product configuration
-$(call inherit-product, device/xiaomi/moon/device.mk)
+# Define hardware platform
+PRODUCT_RELEASE_NAME := moon
 
-# Inherit any OrangeFox-specific settings
-#$(call inherit-product-if-exists, device/xiaomi/moon/fox_moon.mk)
+# Device path for OEM device tree
+DEVICE_PATH := device/xiaomi/$(PRODUCT_RELEASE_NAME)
+
+# Inherit from hardware-specific part of the product configuration
+$(call inherit-product, $(DEVICE_PATH)/device.mk)
 
 # Inherit some common TWRP stuff.
 $(call inherit-product, vendor/twrp/config/common.mk)
