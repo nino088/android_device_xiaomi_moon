@@ -25,13 +25,10 @@ void vendor_load_properties()
     for (const string &prop : prop_partitions)
     {
         property_override(string("ro.product.") + prop + string("brand"), "Redmi");
-        property_override(string("ro.product.") + prop + string("manufacturer"), "Xiaomi");
         property_override(string("ro.product.") + prop + string("name"), "moon");
         property_override(string("ro.product.") + prop + string("device"), "moon");
         property_override(string("ro.product.") + prop + string("model"), "24040RN64Y");
         property_override(string("ro.product.") + prop + string("marketname"), "Redmi 13");
-        property_override(string("ro.product.") + prop + string("cert"), "24040RN64Y");
+        property_override(string("ro.product.system.") + prop + string("device"), "Redmi 13");
     }
-    property_override("ro.bootimage.build.date.utc", "1714403853");
-    property_override("ro.build.date.utc", "1714403853");
 }
