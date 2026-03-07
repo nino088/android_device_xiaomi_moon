@@ -162,7 +162,7 @@ ALLOW_MISSING_DEPENDENCIES := true
 # Assert
 TARGET_OTA_ASSERT_DEVICE := moon
 
- Init
+# Init
 TARGET_INIT_VENDOR_LIB := libinit_moon
 TARGET_RECOVERY_DEVICE_MODULES := libinit_moon
 
