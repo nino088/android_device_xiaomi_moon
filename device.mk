@@ -1,139 +1,114 @@
-# Copyright (C) 2017-2023 The Android Open Source Project
-# Copyright (C) 2014-2023 The Team Win LLC
+# Copyright (C) 2024 The Android Open Source Project
 # SPDX-License-Identifier: Apache-2.0
 
-# Inherit from those products. Most specific first.
-$(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit.mk)
-$(call inherit-product, $(SRC_TARGET_DIR)/product/aosp_base.mk)
+# Inherit from common AOSP config
+$(call inherit-product, $(SRC_TARGET_DIR)/product/base.mk)
+$(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit_only.mk)
 
-# Installs gsi keys into ramdisk, to boot a developer GSI with verified boot.
+# Enable project quotas and casefolding for emulated storage without sdcardfs
+$(call inherit-product, $(SRC_TARGET_DIR)/product/emulated_storage.mk)
+
+# Installs gsi keys into ramdisk, to boot a GSI with verified boot.
 $(call inherit-product, $(SRC_TARGET_DIR)/product/gsi_keys.mk)
 
-# Configure Virtual A/B
-$(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota.mk)
+# some OrangeFox-specific settings
+$(call inherit-product, $(LOCAL_PATH)/fox_moon.mk)
 
-# Configure virtual_ab compression.mk
+# Enable Virtual A/B OTA
+$(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/compression.mk)
 
-# Configure launch_with_vendor_ramdisk.mk
-$(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)
-
-PRODUCT_PROPERTY_OVERRIDES += ro.twrp.vendor_boot=true
-
-# Dynamic
-PRODUCT_USE_DYNAMIC_PARTITIONS := true
-
-# Virtual A/B
 ENABLE_VIRTUAL_AB := true
 AB_OTA_UPDATER := true
-
-AB_OTA_PARTITIONS += \
-    init_boot \
+AB_OTA_PARTITIONS := \
     boot \
-    dtbo \
-    product \
+    vendor_boot \
     system \
     system_ext \
-    system_dlkm \
-    odm_dlkm \
+    vendor \
+    vendor_dlkm \
+    product \
     vbmeta \
     vbmeta_system \
-    vbmeta_vendor \
-    vendor \
-    vendor_boot \
-    vendor_dlkm
-
-# Update engine
-PRODUCT_PACKAGES_DEBUG += \
-    update_engine_client
-
-PRODUCT_PACKAGES += \
-    otapreopt_script \
-    cppreopts.sh \
-    update_engine \
-    update_verifier \
-    update_engine_sideload
+    vbmeta_vendor
 
 AB_OTA_POSTINSTALL_CONFIG += \
     RUN_POSTINSTALL_system=true \
-    POSTINSTALL_PATH_system=system/bin/otapreopt_script \
-    FILESYSTEM_TYPE_system=ext4 \
+    POSTINSTALL_PATH_system=system/bin/mtk_plpath_utils \
+    FILESYSTEM_TYPE_system=$(BOARD_SYSTEMIMAGE_FILE_SYSTEM_TYPE) \
     POSTINSTALL_OPTIONAL_system=true
 
+AB_OTA_POSTINSTALL_CONFIG += \
+    RUN_POSTINSTALL_vendor=true \
+    POSTINSTALL_PATH_vendor=bin/checkpoint_gc \
+    FILESYSTEM_TYPE_vendor=$(BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE) \
+    POSTINSTALL_OPTIONAL_vendor=true
+
+PRODUCT_PACKAGES += \
+    otapreopt_script \
+    cppreopts.sh
+
+PRODUCT_PROPERTY_OVERRIDES += ro.twrp.vendor_boot=true
+
+# Dynamic Partitions
+PRODUCT_USE_DYNAMIC_PARTITIONS := true
+
 # API
-PRODUCT_SHIPPING_API_LEVEL := 32
+PRODUCT_SHIPPING_API_LEVEL := 31
+PRODUCT_TARGET_VNDK_VERSION := 31
 
 # Boot control HAL
 PRODUCT_PACKAGES += \
     android.hardware.boot@1.2-mtkimpl \
-    android.hardware.boot@1.0-impl-1.2-mtkimpl \
-    android.hardware.boot@1.2-mtkimpl.recovery \
-    bootctrl.mt6768
+    android.hardware.boot@1.2-mtkimpl.recovery
 
-PRODUCT_PACKAGES += \
-    android.hardware.boot@1.2-impl \
-    android.hardware.boot@1.2-impl.recovery \
-    android.hardware.boot@1.2-service
+PRODUCT_PACKAGES_DEBUG += \
+    bootctl
 
 # Fastbootd
-TW_INCLUDE_FASTBOOTD := true
 PRODUCT_PACKAGES += \
     android.hardware.fastboot@1.0-impl-mock \
     fastbootd
 
-# Health HAL
+# Health Hal
 PRODUCT_PACKAGES += \
     android.hardware.health@2.1-impl \
-    android.hardware.health@2.1-service \
-    android.hardware.health@2.1-impl.recovery \
-    android.hardware.health@2.1-service.rc
+    android.hardware.health@2.1-service
+
+# Keymaster
+PRODUCT_PACKAGES += \
+    android.hardware.keymaster@4.1
+
+# Keystore Hal
+PRODUCT_PACKAGES += \
+    android.system.keystore2
 
 # Soong
 PRODUCT_SOONG_NAMESPACES += \
     $(LOCAL_PATH)
-
+    
+# MTK plpath utils
 PRODUCT_PACKAGES += \
     create_pl_dev \
     create_pl_dev.recovery
 
 # Additional binaries & libraries needed for recovery
 TARGET_RECOVERY_DEVICE_MODULES += \
-    libkeymaster4 \
-    libkeymaster41 \
+    libion \
     libpuresoftkeymasterdevice \
-    libkeymaster_messages.vendor
+    libkeymint
 
 TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
-    $(TARGET_OUT_SHARED_LIBRARIES)/libkeymaster4.so \
-    $(TARGET_OUT_SHARED_LIBRARIES)/libkeymaster41.so \
+    $(TARGET_OUT_SHARED_LIBRARIES)/libion.so \
     $(TARGET_OUT_SHARED_LIBRARIES)/libpuresoftkeymasterdevice.so \
-    $(TARGET_OUT_SHARED_LIBRARIES)/libkeymaster_messages.so
-# OrangeFox Recovery Configuration
+    $(TARGET_OUT_SHARED_LIBRARIES)/android.hardware.keymaster@4.1 \
+    $(TARGET_OUT_SHARED_LIBRARIES)/android.hardware.vibrator-V1-ndk_platform.so \
+
+# Update engine
 PRODUCT_PACKAGES += \
-    orangefox \
-    init.recovery.mt6768.rc \
-    init.recovery.usb.rc \
-    init.recovery.mt6768.rc.recovery
+    update_engine \
+    update_engine_sideload \
+    update_verifier
 
-# Copy necessary OrangeFox init scripts into recovery ramdisk
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/recovery/fox/init.recovery.mt6768.rc:$(TARGET_COPY_OUT_RECOVERY)/root/init.recovery.mt6768.rc \
-    $(LOCAL_PATH)/recovery/fox/init.recovery.usb.rc:$(TARGET_COPY_OUT_RECOVERY)/root/init.recovery.usb.rc \
-    $(LOCAL_PATH)/recovery/fox/init.recovery.mt6768.rc.recovery:$(TARGET_COPY_OUT_RECOVERY)/root/init.recovery.mt6768.rc.recovery
-
-# OrangeFox Specific Settings
-TW_DEFAULT_LANGUAGE := en
-OF_USE_GREEN_LED := 0
-OF_NO_TREBLE_COMPATIBILITY_CHECK := 1
-OF_PATCH_AVB20 := 1
-OF_CLASSIC_LEDS_FUNCTION := 1
-OF_DONT_PATCH_ENCRYPTED_DEVICE := 1
-OF_SKIP_FBE_DECRYPTION := 1
-OF_IGNORE_LOGICAL_MOUNT_ERRORS := true
-OF_KEEP_FORCED_ENCRYPTION := true
-OF_SUPPORT_ALL_BLOCK_OTA_UPDATES := true
-OF_FIX_OTA_UPDATE_MANUAL_FLASH_ERROR := true
-OF_USE_MAGISKBOOT := 1
-OF_DISABLE_MIUI_OTA_BY_DEFAULT := true
-OF_ENABLE_LPTOOLS := true
-OF_ADVANCED_SECURITY := true
+PRODUCT_PACKAGES_DEBUG += \
+    update_engine_client
