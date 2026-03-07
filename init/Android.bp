@@ -1,5 +1,5 @@
 cc_library_static {
-    name: "libinit_moon",
+    name: "libinit_moom",
     header_libs: [
         "libbase_headers",
     ],
